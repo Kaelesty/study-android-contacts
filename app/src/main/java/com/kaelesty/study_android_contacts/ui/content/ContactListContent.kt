@@ -1,4 +1,4 @@
-package com.example.mvidecomposetest.ui.content
+package com.kaelesty.study_android_contacts.ui.content
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

@@ -1,4 +1,4 @@
-package com.example.mvidecomposetest.presentation.root
+package com.kaelesty.study_android_contacts.presentation.root
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
@@ -11,6 +11,7 @@ import com.example.mvidecomposetest.domain.Contact
 import com.example.mvidecomposetest.presentation.contacts.add.DefaultAddContactComponent
 import com.example.mvidecomposetest.presentation.contacts.edit.DefaultEditContactComponent
 import com.example.mvidecomposetest.presentation.contacts.list.DefaultContactListComponent
+import com.example.mvidecomposetest.presentation.root.RootComponent
 import kotlinx.serialization.Serializable
 
 class DefaultRootComponent(
@@ -19,7 +20,7 @@ class DefaultRootComponent(
 
 	private val navigation = StackNavigation<Config>()
 
-	val stack: Value<ChildStack<Config, ComponentContext>> = childStack(
+	override val stack: Value<ChildStack<*, RootComponent.Child>> = childStack(
 		source = navigation,
 		initialConfiguration = Config.ContactList,
 		handleBackButton = true,
@@ -30,29 +31,31 @@ class DefaultRootComponent(
 	private fun child(
 		config: Config,
 		componentContext: ComponentContext
-	): ComponentContext {
+	): RootComponent.Child {
 		return when (config) {
 			is Config.AddContact -> {
-				DefaultAddContactComponent(
+				val component = DefaultAddContactComponent(
 					componentContext,
 					onContactSaved = {
 						navigation.pop()
 					}
 				)
+				RootComponent.Child.AddContact(component)
 			}
 
 			is Config.EditContact -> {
-				DefaultEditContactComponent(
+				val component = DefaultEditContactComponent(
 					componentContext,
 					config.contact,
 					onContactSaved = {
 						navigation.pop()
 					}
 				)
+				RootComponent.Child.EditContact(component)
 			}
 
 			is Config.ContactList -> {
-				DefaultContactListComponent(
+				val component = DefaultContactListComponent(
 					componentContext,
 					onContactAddingRequested = {
 						navigation.push(Config.AddContact)
@@ -61,12 +64,13 @@ class DefaultRootComponent(
 						navigation.push(Config.EditContact(it))
 					}
 				)
+				RootComponent.Child.ContactList(component)
 			}
 		}
 	}
 
 	@Serializable
-	sealed interface Config {
+	private sealed interface Config {
 
 		@Serializable
 		object ContactList : Config

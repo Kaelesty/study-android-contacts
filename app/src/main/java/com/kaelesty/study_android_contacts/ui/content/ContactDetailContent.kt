@@ -59,10 +59,3 @@ fun AddContact(
         }
     }
 }
-
-@Composable
-fun EditContact(
-    component: ContactComponent
-) {
-    AddContact(component)
-}
