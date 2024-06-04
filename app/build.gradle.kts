@@ -73,4 +73,8 @@ dependencies {
 	implementation(libs.decompose)
 	implementation(libs.decompose.extensions)
 	implementation(libs.kotlinx.serialization.json)
+
+	implementation(libs.mvikotlin)
+	implementation(libs.mvikotlin.main)
+	implementation(libs.mvikotlin.extensions.coroutines)
 }

@@ -1,9 +1,15 @@
 package com.example.mvidecomposetest.presentation.contacts
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.mvikotlin.extensions.coroutines.labels
+import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
+import com.example.mvidecomposetest.presentation.componentScope
+import com.kaelesty.study_android_contacts.presentation.contacts.ContactStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 abstract class DefaultContactComponent(
 	private val componentContext: ComponentContext,
@@ -11,31 +17,19 @@ abstract class DefaultContactComponent(
 	initialPhone: String,
 ) : ContactComponent, ComponentContext by componentContext {
 
-	init {
-		stateKeeper.register(KEY, strategy = ContactComponent.Model.serializer()) {
-			_model.value
-		}
-	}
+	lateinit var store: ContactStore
 
-	private val _model = MutableStateFlow(
-		stateKeeper.consume(
-			KEY,
-			strategy = ContactComponent.Model.serializer()
-		) ?: ContactComponent.Model(initialName, initialPhone)
-	)
-	override val model: StateFlow<ContactComponent.Model>
-		get() = _model.asStateFlow()
+	@OptIn(ExperimentalCoroutinesApi::class)
+	private val _model = store.stateFlow
+	override val model: StateFlow<ContactStore.State>
+		get() = _model
 
 
 	override fun onUsernameChanged(name: String) {
-		_model.value = _model.value.copy(name = name)
+		store.accept(ContactStore.Intent.ChangeUsername(name))
 	}
 
 	override fun onPhoneChanged(phone: String) {
-		_model.value = _model.value.copy(phone = phone)
-	}
-
-	companion object {
-		private const val KEY = "DefaultContactComponent"
+		store.accept(ContactStore.Intent.ChangePhone(phone))
 	}
 }

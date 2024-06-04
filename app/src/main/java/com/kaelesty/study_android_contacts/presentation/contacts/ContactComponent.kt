@@ -1,17 +1,12 @@
 package com.example.mvidecomposetest.presentation.contacts
 
+import com.kaelesty.study_android_contacts.presentation.contacts.ContactStore
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 interface ContactComponent {
 
-	@Serializable
-	data class Model(
-		val name: String,
-		val phone: String,
-	)
-
-	val model: StateFlow<Model>
+	val model: StateFlow<ContactStore.State>
 
 	fun onSaveContact()
 
