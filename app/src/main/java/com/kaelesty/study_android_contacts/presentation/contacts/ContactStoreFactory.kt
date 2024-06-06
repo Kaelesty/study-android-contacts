@@ -3,16 +3,26 @@ package com.kaelesty.study_android_contacts.presentation.contacts
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.arkivanov.mvikotlin.core.store.create
+import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
+import com.example.mvidecomposetest.domain.AddContactUseCase
+import com.example.mvidecomposetest.domain.Contact
+import com.example.mvidecomposetest.domain.EditContactUseCase
 
 class ContactStoreFactory(
-	private val storeFactory: StoreFactory
+	private val storeFactory: StoreFactory,
+	private val addContactUseCase: AddContactUseCase,
+	private val editContactUseCase: EditContactUseCase,
 ) {
-	private val storeStore: Store<ContactStore.Intent, ContactStore.State, ContactStore.Label> =
-		storeFactory.create(
-			"ContactStore",
-			initialState = ContactStore.State("", ""),
 
-		)
+	fun create(
+		contact: Contact
+	): ContactStore = object : ContactStore by storeFactory.create(
+		"ContactStore",
+		initialState = ContactStore.State(contact.id, contact.phone, contact.username),
+		reducer = ReducerImpl,
+		executorFactory = ::ExecutorImpl
+	) as ContactStore {}
 
 	private sealed interface Action
 
@@ -21,6 +31,37 @@ class ContactStoreFactory(
 		class ChangeUsername(val username: String): Msg
 
 		class ChangePhone(val phone: String): Msg
+	}
+
+	private inner class ExecutorImpl:
+		CoroutineExecutor<ContactStore.Intent, Action, ContactStore.State, Msg, ContactStore.Label>() {
+		override fun executeIntent(intent: ContactStore.Intent) {
+			when (intent) {
+				is ContactStore.Intent.ChangePhone -> {
+					dispatch(Msg.ChangePhone(intent.phone))
+				}
+				is ContactStore.Intent.ChangeUsername -> {
+					dispatch(Msg.ChangeUsername(intent.username))
+				}
+				ContactStore.Intent.SaveContact -> {
+					with(state()) {
+						editContactUseCase(
+							Contact(
+								id, username, phone
+							)
+						)
+					}
+					publish(ContactStore.Label.ContactSaved)
+				}
+
+				ContactStore.Intent.AddContact -> {
+					addContactUseCase(
+						state().username, state().phone
+					)
+					publish(ContactStore.Label.ContactSaved)
+				}
+			}
+		}
 	}
 
 	private object ReducerImpl: Reducer<ContactStore.State, Msg> {

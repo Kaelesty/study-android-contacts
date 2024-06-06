@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 interface ContactListStore: Store<ContactListStore.Intent, ContactListStore.State, ContactListStore.Label> {
 
 	@Serializable
-	class State(
+	data class State(
 		val contacts: List<Contact>
 	)
 

@@ -7,6 +7,7 @@ interface ContactStore: Store<ContactStore.Intent, ContactStore.State, ContactSt
 
 	@Serializable
 	data class State(
+		val id: Int,
 		val phone: String,
 		val username: String,
 	)
@@ -23,5 +24,7 @@ interface ContactStore: Store<ContactStore.Intent, ContactStore.State, ContactSt
 		class ChangePhone(val phone: String): Intent
 
 		object SaveContact: Intent
+
+		object AddContact: Intent
 	}
 }
