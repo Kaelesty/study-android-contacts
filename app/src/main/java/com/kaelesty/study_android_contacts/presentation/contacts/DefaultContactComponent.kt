@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
+import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.example.mvidecomposetest.data.RepositoryImpl
 import com.example.mvidecomposetest.domain.AddContactUseCase
@@ -36,7 +37,7 @@ abstract class DefaultContactComponent(
 
 	val store: ContactStore = instanceKeeper.getStore {
 		ContactStoreFactory(
-			DefaultStoreFactory(), //
+			LoggingStoreFactory(DefaultStoreFactory()), //
 			AddContactUseCase(RepositoryImpl), // params should be injected by di
 			EditContactUseCase(RepositoryImpl), //
 		).create(contact)
