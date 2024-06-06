@@ -15,13 +15,15 @@ class ContactListStoreFactory(
 ) {
 
 
-	fun create(): ContactListStore = object : ContactListStore by storeFactory.create(
+	fun create(): ContactListStore = object :
+		ContactListStore, Store<ContactListStore.Intent, ContactListStore.State, ContactListStore.Label>
+		by storeFactory.create(
 		name = "ContactListStore",
 		initialState = ContactListStore.State(listOf()),
 		reducer = ReducerImpl,
 		executorFactory = ::ExecutorImpl,
 		bootstrapper = BootstrapperImpl()
-	) as ContactListStore {}
+	) {}
 
 	private sealed interface Action {
 		class UpdateContactList(val contacts: List<Contact>): Action

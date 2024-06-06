@@ -35,7 +35,7 @@ fun AddContact(
     ) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = model.name,
+            value = model.username,
             placeholder = {
                 Text(text = "Username:")
             },

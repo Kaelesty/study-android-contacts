@@ -3,7 +3,6 @@ package com.kaelesty.study_android_contacts.presentation.contacts
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.arkivanov.mvikotlin.core.store.create
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.example.mvidecomposetest.domain.AddContactUseCase
 import com.example.mvidecomposetest.domain.Contact
@@ -17,12 +16,14 @@ class ContactStoreFactory(
 
 	fun create(
 		contact: Contact
-	): ContactStore = object : ContactStore by storeFactory.create(
+	): ContactStore = object :
+		ContactStore, Store<ContactStore.Intent, ContactStore.State, ContactStore.Label>
+	by storeFactory.create(
 		"ContactStore",
 		initialState = ContactStore.State(contact.id, contact.phone, contact.username),
 		reducer = ReducerImpl,
 		executorFactory = ::ExecutorImpl
-	) as ContactStore {}
+	) {}
 
 	private sealed interface Action
 
